@@ -1,2 +1,1 @@
-# js_initial_environment
-Начальная настройка для JavaScrip проектов. Настройка webpack, jest, babel.
+# Fist step in d3.js

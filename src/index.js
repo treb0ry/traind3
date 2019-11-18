@@ -314,12 +314,25 @@ async function drawHistgrams(metric) {
     .domain([0, d3.max(bins, yAccessor)])
     .range([dimensions.boundedHeight, 0])
     .nice();
-  const binsGroup = bounds.append("g");
+  const binsGroup = bounds
+    .append("g")
+    .attr("tabindex", "0")
+    .attr("role", "list")
+    .attr("aria-label", "histogram bars");
   const binGroups = binsGroup
     .selectAll("g")
     .data(bins)
     .enter()
-    .append("g");
+    .append("g")
+    .attr("tabindex", "0")
+    .attr("role", "listitem")
+    .attr(
+      "aria-label",
+      d =>
+        `There were ${yAccessor(d)} days between ${d.x0
+          .toString()
+          .slice(0, 4)} and ${d.x1.toString().slice(0, 4)} ${metric} levels.`
+    );
   const barPadding = 1;
   const barRects = binGroups
     .append("rect")
@@ -368,5 +381,14 @@ async function drawHistgrams(metric) {
     .style("font-size", "1.4em")
     .text(metric)
     .style("text-trasform", "capitalize");
+  wrapper
+    .attr("role", "figure")
+    .attr("tabindex", "0")
+    .append("title")
+    .text(`Histogram looking at the distribution of ${metric}`);
+  wrapper
+    .selectAll("text")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true");
 }
 metrics.forEach(drawHistgrams);

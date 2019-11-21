@@ -59,8 +59,6 @@ async function drawLineChart() {
     .style("transform", `translateY(${dimensions.boundedHeight}px)`);
 
   const drawLine = dataset => {
-    // 4. Create scales
-
     const yScale = d3
       .scaleLinear()
       .domain(d3.extent(dataset, yAccessor))
@@ -79,8 +77,6 @@ async function drawLineChart() {
       .domain(d3.extent(dataset, xAccessor))
       .range([0, dimensions.boundedWidth]);
 
-    // 5. Draw data
-
     const lineGenerator = d3
       .line()
       .x(d => xScale(xAccessor(d)))
@@ -97,8 +93,6 @@ async function drawLineChart() {
       .style("transform", "none")
       .attr("d", lineGenerator(dataset));
 
-    // 6. Draw peripherals
-
     const yAxisGenerator = d3.axisLeft().scale(yScale);
 
     const yAxis = bounds
@@ -113,7 +107,6 @@ async function drawLineChart() {
   };
   drawLine(dataset);
 
-  // update the line every 1.5 seconds
   setInterval(addNewDay, 1500);
   function addNewDay() {
     dataset = [...dataset.slice(1), generateNewDataPoint(dataset)];
@@ -315,6 +308,31 @@ async function drawHistogram() {
     .attr("fill", "black")
     .style("font-size", "1.4em")
     .text("Humidity");
+  binGroups
+    .select("rect")
+    .on("mouseenter", onMouseEnter)
+    .on("mouseleave", onMouseLeave);
+  const tooltip = d3.select("#tooltip");
+  const formatHumidity = d3.format(".2f");
+  function onMouseEnter(datum) {
+    tooltip.select("#count").text(yAccessor(datum));
+    tooltip
+      .select("#range")
+      .text([formatHumidity(datum.x0), formatHumidity(datum.x1)].join(" - "));
+    const x =
+      xScale(datum.x0) +
+      (xScale(datum.x1) - xScale(datum.x0)) / 2 +
+      dimensions.margin.left;
+    const y = yScale(yAccessor(datum)) + dimensions.margin.top;
+    tooltip.style(
+      "transform",
+      `translate(` + `calc( -50% + ${x}px),` + `calc(-100% + ${y}px)` + `)`
+    );
+    tooltip.style("opacity", 1);
+  }
+  function onMouseLeave(datum) {
+    tooltip.style("opacity", 0);
+  }
 }
 
 async function drawHistgrams(metric) {
@@ -657,9 +675,9 @@ async function createEvent() {
       .on("mouseout", null);
   }, 3000);
 }
-createEvent();
+//createEvent();
 //drawAnimBars();
-// drawHistogram();
+drawHistogram();
 // drawScatterplot();
 // drawLineChart();
 //metrics.forEach(drawHistgrams);

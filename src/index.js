@@ -187,6 +187,7 @@ async function drawScatterplot() {
     .style("transform", `translateY(${dimensions.boundedHeight}px)`);
   const xAisLabel = xAxis
     .append("text")
+    .attr("class", "x-zxis-label")
     .attr("x", dimensions.boundedWidth / 2)
     .attr("y", dimensions.margin.bottom - 10)
     .attr("fill", "black")
@@ -201,6 +202,7 @@ async function drawScatterplot() {
 
   const yAxisLabel = yAxis
     .append("text")
+    .attr("class", "y-axis-label")
     .attr("x", -dimensions.boundedHeight / 2)
     .attr("y", -dimensions.margin.left + 10)
     .attr("fill", "black")
@@ -208,6 +210,30 @@ async function drawScatterplot() {
     .text("Relative humidity")
     .style("transform", "rotate(-90deg)")
     .style("text-anchor", "middle");
+  bounds
+    .selectAll("circle")
+    .on("mouseenter", onMouseEnter)
+    .on("mouseleave", onMouseLeave);
+  const tooltip = d3.select("#tooltipscatterplot");
+  function onMouseEnter(datum, index) {
+    const formatHumidity = d3.format(".2f");
+    tooltip.select("#humidity").text(formatHumidity(yAccessor(datum)));
+    const formatDewPoint = d3.format(".2f");
+    tooltip.select("#dew-point").text(formatDewPoint(xAccessor(datum)));
+    const dateParser = d3.timeParse("%Y-%m-%d");
+    const formatDate = d3.timeFormat("%B %A %-d,%Y");
+    tooltip.select("#date").text(formatDate(dateParser(datum.date)));
+    const x = xScale(xAccessor(datum)) + dimensions.margin.left;
+    const y = yScale(yAccessor(datum)) + dimensions.margin.top;
+    tooltip.style(
+      "transform",
+      `translate(` + `calc( -50% + ${x}px),` + `calc(-100% + ${y}px)` + `)`
+    );
+    tooltip.style("opacity", 1);
+  }
+  function onMouseLeave() {
+    tooltip.style("opacity", 0);
+  }
 }
 async function drawHistogram() {
   const dataset = await getDataset();
@@ -677,7 +703,7 @@ async function createEvent() {
 }
 //createEvent();
 //drawAnimBars();
-drawHistogram();
-// drawScatterplot();
+//drawHistogram();
+drawScatterplot();
 // drawLineChart();
 //metrics.forEach(drawHistgrams);

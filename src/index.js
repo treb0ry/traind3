@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { Delaunay } from "d3-delaunay";
 
 async function getDataset() {
   return await d3.json("./my_weather_data.json");
@@ -166,6 +167,24 @@ async function drawScatterplot() {
     .domain(d3.extent(dataset, yAccessor))
     .range([dimensions.boundedHeight, 0])
     .nice();
+  const delaunay = Delaunay.from(
+    dataset,
+    d => xScale(xAccessor(d)),
+    d => yScale(yAccessor(d))
+  );
+  const voronoi = delaunay.voronoi();
+  voronoi.xmax = dimensions.boundedWidth;
+  voronoi.ymax = dimensions.boundedHeight;
+  bounds
+    .selectAll(".voronoi")
+    .data(dataset)
+    .enter()
+    .append("path")
+    .attr("class", "voronoi")
+    .attr("d", (d, i) => voronoi.renderCell(i))
+    .on("mouseenter", onMouseEnter)
+    .on("mouseleave", onMouseLeave);
+
   const colorScale = d3
     .scaleLinear()
     .domain(d3.extent(dataset, colorAccessor))
@@ -210,10 +229,8 @@ async function drawScatterplot() {
     .text("Relative humidity")
     .style("transform", "rotate(-90deg)")
     .style("text-anchor", "middle");
-  bounds
-    .selectAll("circle")
-    .on("mouseenter", onMouseEnter)
-    .on("mouseleave", onMouseLeave);
+  bounds.selectAll("circle");
+
   const tooltip = d3.select("#tooltipscatterplot");
   function onMouseEnter(datum, index) {
     const formatHumidity = d3.format(".2f");
@@ -230,9 +247,18 @@ async function drawScatterplot() {
       `translate(` + `calc( -50% + ${x}px),` + `calc(-100% + ${y}px)` + `)`
     );
     tooltip.style("opacity", 1);
+    const dayDot = bounds
+      .append("circle")
+      .attr("class", "tooltipDot")
+      .attr("cx", xScale(xAccessor(datum)))
+      .attr("cy", yScale(yAccessor(datum)))
+      .attr("r", 7)
+      .attr("fill", "maroon")
+      .style("pointer-events", "none");
   }
   function onMouseLeave() {
     tooltip.style("opacity", 0);
+    d3.selectAll(".tooltipDot").remove();
   }
 }
 async function drawHistogram() {

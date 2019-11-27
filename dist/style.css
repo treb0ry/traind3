@@ -1,13 +1,15 @@
-#scatterplot {
+.wrapper {
   position: relative;
 }
-.tooltip {
-  opacity: 0;
+
+.freezing {
+  fill: #e0f3f3;
 }
-.x-axis-label {
-  fill: black;
-  font-size: 1.4em;
-  text-transform: capitalize;
+
+.line {
+  fill: none;
+  stroke: #af9358;
+  stroke-width: 2;
 }
 
 .y-axis-label {
@@ -17,22 +19,17 @@
   transform: rotate(-90deg);
 }
 
-circle {
-  fill: cornflowerblue;
-}
-
-.voronoi {
-  fill: transparent;
+.listening-rect {
 }
 
 body {
   display: flex;
   justify-content: center;
-  padding: 3em 1em;
+  padding: 5em 1em;
   font-family: sans-serif;
 }
 
-.tooltipscatterplot {
+.tooltip {
   opacity: 0;
   position: absolute;
   top: -14px;
@@ -48,7 +45,7 @@ body {
   pointer-events: none;
 }
 
-.tooltipscatterplot:before {
+.tooltip:before {
   content: "";
   position: absolute;
   bottom: 0;
@@ -69,4 +66,7 @@ body {
   font-weight: 600;
   font-size: 1.1em;
   line-height: 1.4em;
+}
+.listening-rect {
+  fill: transparent;
 }

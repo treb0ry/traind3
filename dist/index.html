@@ -9,27 +9,14 @@
     <style></style>
   </head>
   <body>
-    <div class="box"></div>
-    <div id="wrapper"></div>
-    <div id="scatterplot">
-      <div id="tooltipscatterplot" class="tooltipscatterplot">
-        <div class="tooltip-date">
-            <span id="date"></span>
-        </div>
-        <div class="tooltip-humidity">
-            Humidity: <span id="humidity"></span>
-        </div>
-        <div class="tooltip-dew-point">
-            Dew Point: <span id="dew-point"></span>
-        </div>
-    </div>
-
-</div>
-    </div>
-    <div id="histogram">
+    <div id="wrapper" class="wrapper">
       <div id="tooltip" class="tooltip">
-        <div class="tooltip-range">Humidity: <span id="range"></span></div>
-        <div class="tooltip-value"><span id="count"></span> days</div>
+        <div class="tooltip-date">
+          <span id="date"></span>
+        </div>
+        <div class="tooltip-temperature">
+          Maximum Temperature: <span id="temperature"></span>
+        </div>
       </div>
     </div>
     <svg height="200" width="500" id="colorRects"></svg>

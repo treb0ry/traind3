@@ -51,7 +51,7 @@ async function drawLineChart() {
   bounds.append("rect").attr("class", "freezing");
   const clip = bounds.append("g").attr("clip-path", "url(#bounds-clip-path");
   clip.append("path").attr("class", "line");
-  // init static elements
+
   bounds.append("rect").attr("class", "freezing");
   bounds.append("path").attr("class", "line");
   bounds
@@ -105,6 +105,56 @@ async function drawLineChart() {
     const xAxisGenerator = d3.axisBottom().scale(xScale);
 
     const xAxis = bounds.select(".x-axis").call(xAxisGenerator);
+
+    const listeninRect = bounds
+      .append("rect")
+      .attr("class", "listening-rect")
+      .attr("width", dimensions.boundedWidth)
+      .attr("height", dimensions.boundedHeight)
+      .on("mousemove", onMouseMove)
+      .on("mouseleave", onMouseLeave);
+
+    const tooltip = d3.select("#tooltip");
+    const tooltipCircle = bounds
+      .append("circle")
+      .attr("r", 4)
+      .attr("stroke", "#af9350")
+      .attr("fill", "white")
+      .attr("stroke-width", 2)
+      .style("opacity", 0);
+    function onMouseMove() {
+      const mousePosition = d3.mouse(this);
+      const hoverdDate = xScale.invert(mousePosition[0]);
+      const getDistanceFromHoveredDate = d =>
+        Math.abs(xAccessor(d) - hoverdDate);
+      const closestIndex = d3.scan(
+        dataset,
+        (a, b) => getDistanceFromHoveredDate(a) - getDistanceFromHoveredDate(b)
+      );
+      const closestDataPoint = dataset[closestIndex];
+      const closestXValue = xAccessor(closestDataPoint);
+      const closestYValue = yAccessor(closestDataPoint);
+      const formaTemperture = d => `${d3.format(".1f")(d)}F`;
+      const formatDate = d3.timeFormat("%B %A %-d, %Y");
+      tooltip.select("#date").text(formatDate(closestXValue));
+
+      tooltip.select("#temperature").text(formaTemperture(closestYValue));
+      const x = xScale(closestXValue) + dimensions.margin.left;
+      const y = yScale(closestYValue) + dimensions.margin.top;
+      tooltip.style(
+        "transform",
+        `translate(` + `calc( -50% + ${x}px),` + `calc( -100% + ${y}px)` + `)`
+      );
+      tooltipCircle
+        .attr("cx", xScale(closestXValue))
+        .attr("cy", yScale(closestYValue))
+        .style("opacity", 1);
+      tooltip.style("opacity", 1);
+    }
+    function onMouseLeave() {
+      tooltip.style("opacity", 0);
+      tooltipCircle.style("opacity", 0);
+    }
   };
   drawLine(dataset);
 
@@ -730,6 +780,6 @@ async function createEvent() {
 //createEvent();
 //drawAnimBars();
 //drawHistogram();
-drawScatterplot();
-// drawLineChart();
+//drawScatterplot();
+drawLineChart();
 //metrics.forEach(drawHistgrams);

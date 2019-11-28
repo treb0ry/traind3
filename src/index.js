@@ -845,9 +845,61 @@ async function drawMap() {
     .attr("d", pathGenerator)
     .attr("fill", d => {
       const metricValue = metricDataByCountry[countryIdAccessor(d)];
-      if (typeof metricValue == "undefined") return "#e2e6e9";
+      if (typeof metricValue == "undefined") return "#fff";
       return colorScale(metricValue);
     });
+  const legendGroup = wrapper
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${120},${
+        dimensions.width < 800
+          ? dimensions.boundedHeight - 10
+          : dimensions.boundedHeight * 0.5
+      })`
+    );
+  const legendTitle = legendGroup
+    .append("text")
+    .attr("y", -23)
+    .attr("class", "legend-title")
+    .text("Population growth");
+  const legendByLine = legendGroup
+    .append("text")
+    .attr("y", -9)
+    .attr("class", "legend-byline")
+    .text("Precent change in 2018");
+  const defs = wrapper.append("defs");
+  const legendGradientId = "legend-gradient";
+  const gradient = defs
+    .append("linearGradient")
+    .attr("id", legendGradientId)
+    .selectAll("stop")
+    .data(colorScale.range())
+    .enter()
+    .append("stop")
+    .attr("stop-color", d => d)
+    .attr("offset", (d, i) => `${(i * 100) / 2}%`);
+  const legendWidht = 120;
+  const legendHeight = 16;
+  const legendGradient = legendGroup
+    .append("rect")
+    .attr("x", -legendWidht / 2)
+    .attr("height", legendHeight)
+    .attr("width", legendWidht)
+    .style("fill", `url(#${legendGradientId})`);
+  const legendValueRight = legendGroup
+    .append("text")
+    .attr("class", "legend-value")
+    .attr("x", legendWidht / 2 + 10)
+    .attr("y", legendHeight / 2)
+    .text(`${d3.format(".1f")(maxChange)}%`);
+  const legendValueLeft = legendGroup
+    .append("text")
+    .attr("class", "legend-value")
+    .attr("x", -legendWidht / 2 - 10)
+    .attr("y", legendHeight / 2)
+    .text(`${d3.format(".1f")(-maxChange)}%`)
+    .style("text-anchor", "end");
 }
 drawMap();
 //createEvent();

@@ -114,3 +114,7 @@ body {
 .legend-value:first-of-type {
   text-anchor: end;
 }
+.my-location {
+  fill: #8f97db;
+  stroke: white;
+}

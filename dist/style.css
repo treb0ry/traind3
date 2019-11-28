@@ -70,3 +70,14 @@ body {
 .listening-rect {
   fill: transparent;
 }
+.earth {
+  fill: #e2f1f1;
+  stroke: none;
+}
+.graticule {
+  stroke: #cadddd;
+  fill: none;
+}
+.country:hover {
+  fill: cornflowerblue;
+}

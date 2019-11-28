@@ -820,6 +820,34 @@ async function drawMap() {
       "transform",
       `translate(${dimensions.margin.left}px,${dimensions.margin.top}px`
     );
+  const metricValues = Object.values(metricDataByCountry);
+  const metricValueExtent = d3.extent(metricValues);
+  const maxChange = d3.max([-metricValueExtent[0], metricValueExtent[1]]);
+  const colorScale = d3
+    .scaleLinear()
+    .domain([-maxChange, 0, maxChange])
+    .range(["indigo", "white", "darkgreen"]);
+  const earth = bounds
+    .append("path")
+    .attr("class", "earth")
+    .attr("d", pathGenerator(sphere));
+  const graticuleJson = d3.geoGraticule10();
+  const graticule = bounds
+    .append("path")
+    .attr("class", "graticule")
+    .attr("d", pathGenerator(graticuleJson));
+  const countries = bounds
+    .selectAll(".country")
+    .data(countryShapes.features)
+    .enter()
+    .append("path")
+    .attr("class", "country")
+    .attr("d", pathGenerator)
+    .attr("fill", d => {
+      const metricValue = metricDataByCountry[countryIdAccessor(d)];
+      if (typeof metricValue == "undefined") return "#e2e6e9";
+      return colorScale(metricValue);
+    });
 }
 drawMap();
 //createEvent();
